@@ -168,7 +168,9 @@ def push_bark(title: str, body: str, level: str) -> None:
     try:
         enc_t = urllib.parse.quote(title, safe="")
         enc_b = urllib.parse.quote(body, safe="")
-        url = f"{BARK_SERVER}/{BARK_KEY}/{enc_t}/{enc_b}?group={GROUP}&level={level}&sound=bell"
+        base = f"{BARK_SERVER}/{BARK_KEY}/{enc_t}/{enc_b}"
+        query = urllib.parse.urlencode({"group": GROUP, "level": level, "sound": "bell"})
+        url = f"{base}?{query}"
         req = urllib.request.Request(url, method="GET")
         with urllib.request.urlopen(req, timeout=8) as resp:
             if 200 <= resp.status < 300:
