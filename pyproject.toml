@@ -1,7 +1,7 @@
 [project]
 name = "ccbell"
-version = "0.1.0.dev0"
-description = "A multi-device notification hub for Claude Code sessions"
+version = "0.2.0"
+description = "Minimal Claude Code → iPhone notifier (Bark)"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
@@ -9,17 +9,13 @@ authors = [
     { name = "ccbell contributors" },
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
 ]
-dependencies = ["PyYAML>=6.0"]
+dependencies = []
 
 [project.scripts]
-ccbell = "ccbell.dispatcher:main"
+ccbell = "ccbell.notify:main"
 
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
