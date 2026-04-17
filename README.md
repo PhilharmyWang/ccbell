@@ -97,6 +97,19 @@ echo '{"hook_event_name":"Stop","session_id":"abcdef1234567890","cwd":"/tmp/demo
 You should see structured output on stderr and a push notification on your phone.
 Logs are written to `~/.ccbell/ccbell.log`.
 
+### 5. Optional: add ntfy
+
+To also push via [ntfy](https://ntfy.sh), uncomment the ntfy section in `config.yaml` and set your topic:
+
+```yaml
+  - name: ntfy
+    enabled: true
+    server: "https://ntfy.sh"
+    topic: "ccbell-YOUR-RANDOM-STRING"
+```
+
+> **Important:** ntfy.sh public topics are visible to anyone who knows the name. Use a long, random, hard-to-guess string for your topic (e.g. `ccbell-a1b2c3d4e5f6-32chars`), or host your own ntfy server.
+
 ## Configuration
 
 > **TODO** — `config.yaml` reference and examples will be added in a future release.

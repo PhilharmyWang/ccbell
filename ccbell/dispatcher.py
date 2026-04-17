@@ -32,7 +32,7 @@ _TITLE_MAP = {
     "SubagentStop": "🧩 [{device}] 子代理完成",
 }
 
-_KNOWN_BACKENDS = {"bark"}
+_KNOWN_BACKENDS = {"bark", "ntfy"}
 
 
 def _make_title(event: str, device: str) -> str:

@@ -1,7 +1,7 @@
 # ccbell 设计文档
 
 > 版本：v0.1（设计阶段）
-> 最后更新：2026-04-17
+> 最后更新：2026-04-17（Step 3b 完成）
 
 ---
 
@@ -136,8 +136,14 @@ backends:
     key: "your-bark-key"
   - name: ntfy
     enabled: true
-    url: "https://ntfy.sh"
-    topic: "your-ntfy-topic"
+    server: "https://ntfy.sh"           # ntfy 服务器地址
+    topic: "ccbell-REPLACE-with-unique-string"  # 订阅主题，使用随机难猜字符串
+    token: ""                           # 可选，访问令牌（自建/付费 topic）
+    tags: "bell,robot"                  # 可选，逗号分隔或列表
+    priority_map:                       # 可选，level → ntfy priority 映射
+      info: 3
+      warning: 4
+      error: 5
   - name: feishu
     enabled: false
     webhook_url: "https://open.feishu.cn/open-apis/bot/v2/hook/YOUR_TOKEN"
@@ -206,7 +212,14 @@ Dispatcher 通过 `subprocess.run([sys.executable, "-m", "ccbell.backends.<name>
 - Backend 的专属配置从 `config.yaml` 的 `backends` 列表中对应 `name` 的条目读取
 - Dispatcher 在调用时将该条目（去掉 `name` 和 `enabled` 字段）序列化为 JSON 放入 `CCBELL_BACKEND_CONFIG`
 
-### 6.2 新增 Backend 步骤
+### 6.2 已实现的后端
+
+| 后端   | 状态     | 说明                         |
+|--------|----------|------------------------------|
+| bark   | 已实现   | iOS push，自建或官方服务器   |
+| ntfy   | 已实现   | 跨平台，自建或 ntfy.sh      |
+
+### 6.3 新增 Backend 步骤
 
 1. 在 `backends/` 下创建 `<name>.py`
 2. 在 `config.yaml` 的 `backends` 列表中添加对应配置块
