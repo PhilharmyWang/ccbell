@@ -31,3 +31,7 @@ Thumbs.db
 
 # Environment variables
 .env
+
+# local user config (never commit)
+config.yaml
+config.local.yaml
