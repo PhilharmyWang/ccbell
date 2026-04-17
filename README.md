@@ -45,9 +45,23 @@ Optionally, ccbell can enrich notifications with training experiment links, job 
 
 ## Quick start
 
-> **Note:** ccbell is currently at v0.1 dev. No real push notifications are sent yet — this is a dry-run skeleton to validate the hook integration.
+> **Note:** ccbell currently supports Bark push (iOS). More backends coming soon.
 
-### 1. Register hooks in Claude Code settings
+### 1. Install
+
+```bash
+cd /path/to/ccbell
+pip install -e .
+```
+
+### 2. Configure
+
+```bash
+cp config.example.yaml config.yaml
+# Edit config.yaml and replace YOUR_BARK_KEY with your real Bark device key
+```
+
+### 3. Register hooks in Claude Code settings
 
 Add the following to `~/.claude/settings.json`:
 
@@ -72,16 +86,16 @@ Add the following to `~/.claude/settings.json`:
 
 Replace `/path/to/ccbell` with the actual path to your local ccbell repository.
 
-### 2. Dry-run test
+### 4. Verify
 
 ```bash
 # From the ccbell repository root
 echo '{"hook_event_name":"Stop","session_id":"abcdef1234567890","cwd":"/tmp/demo-project","transcript_path":""}' \
-  | CCBELL_DEVICE_NAME=laptop CCBELL_DEBUG=1 python3 hooks/dispatch.py
+  | CCBELL_DEBUG=1 python3 hooks/dispatch.py
 ```
 
-You should see structured output on stderr (CCBELL_TITLE, CCBELL_BODY, etc.) and the exit code should be `0`.
-Logs are also written to `~/.ccbell/ccbell.log`.
+You should see structured output on stderr and a push notification on your phone.
+Logs are written to `~/.ccbell/ccbell.log`.
 
 ## Configuration
 

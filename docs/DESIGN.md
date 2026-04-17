@@ -51,21 +51,29 @@ flowchart LR
 ## 3. 目录结构职责说明
 
 ```
-ccbell/
-├── docs/                  # 设计文档、开发指南
-│   └── DESIGN.md          # 本文档
-├── hooks/                 # Claude Code hook 脚本入口
-│   └── (hook_name).py     # 各 hook event 对应的入口脚本
-├── backends/              # 通知后端实现
-│   └── (backend_name).py  # 每个后端一个脚本（bark.py, ntfy.py, ...）
-├── enrichers/             # 上下文增强器实现
-│   └── (enricher_name).py # 每个 enricher 一个脚本（gpu.py, slurm.py, ...）
-├── lib/                   # 内部公共库
-│   └── (modules).py       # 摘要生成、配置读取、过滤逻辑等
-├── tests/                 # 测试
-│   └── fixtures/          # 测试固件（示例 transcript.jsonl 等）
-├── config.yaml            # 用户配置（不入库，.gitignore 已忽略）
-├── .github/workflows/     # CI/CD
+ccbell/                     # Python 包根目录
+├── __init__.py
+├── __main__.py             # python -m ccbell 入口
+├── config.py               # 配置加载（YAML + 环境变量）
+├── dispatcher.py           # 核心调度逻辑
+├── logger.py               # 日志
+├── summary.py              # 摘要提取与脱敏
+├── backends/               # 通知后端子包
+│   ├── __init__.py
+│   ├── base.py             # 共用工具（read_invocation_env, die）
+│   └── bark.py             # Bark 后端
+├── docs/                   # 设计文档
+│   └── DESIGN.md
+├── hooks/                  # Claude Code hook 入口
+│   └── dispatch.py
+├── enrichers/              # 上下文增强器（Step 4）
+├── tests/
+│   ├── fixtures/           # 测试固件
+│   └── test_*.py
+├── config.example.yaml     # 示例配置（入库）
+├── config.yaml             # 真实配置（不入库）
+├── pyproject.toml
+├── .github/workflows/
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -168,16 +176,24 @@ summary:
 
 ### 6.1 Backend 接口约定
 
-每个 Backend 脚本（`backends/<name>.py`）遵循以下约定：
+每个 Backend 模块（`ccbell/backends/<name>.py`）遵循以下约定：
 
-**输入（通过环境变量）：**
+**Dispatcher 调用方式：**
 
-| 环境变量      | 说明                                     |
-|---------------|------------------------------------------|
-| `CCBELL_TITLE`  | 通知标题                                 |
-| `CCBELL_BODY`   | 通知正文（含 enricher 附加内容）          |
-| `CCBELL_GROUP`  | 设备分组标识                              |
-| `CCBELL_LEVEL`  | 通知级别（`info` / `warning` / `error`）  |
+Dispatcher 通过 `subprocess.run([sys.executable, "-m", "ccbell.backends.<name>"])` 调用后端，并传入以下环境变量：
+
+| 环境变量               | 说明                                           |
+|------------------------|------------------------------------------------|
+| `CCBELL_TITLE`         | 通知标题                                       |
+| `CCBELL_BODY`          | 通知正文（含 enricher 附加内容）                |
+| `CCBELL_GROUP`         | 设备分组标识                                    |
+| `CCBELL_LEVEL`         | 通知级别（`info` / `warning` / `error`）        |
+| `CCBELL_BACKEND_CONFIG`| JSON 字符串，包含该 backend 在 config.yaml 中的所有专属参数（key, server, sound, level_map 等） |
+
+**Backend 读取配置方式：**
+
+- 调用 `read_invocation_env()` 从环境变量获取通用字段和 `backend_config` 字典
+- 从 `backend_config` 中读取自己需要的参数（如 `key`, `server`, `sound`, `level_map`）
 
 **输出约定：**
 
@@ -187,7 +203,8 @@ summary:
 
 **配置读取：**
 
-- Backend 从 `config.yaml` 的 `backends` 列表中读取自己的 `name` 对应的配置块
+- Backend 的专属配置从 `config.yaml` 的 `backends` 列表中对应 `name` 的条目读取
+- Dispatcher 在调用时将该条目（去掉 `name` 和 `enabled` 字段）序列化为 JSON 放入 `CCBELL_BACKEND_CONFIG`
 
 ### 6.2 新增 Backend 步骤
 

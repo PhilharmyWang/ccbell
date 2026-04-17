@@ -1,0 +1,28 @@
+# config.example.yaml — ccbell 示例配置
+# 本文件为示例，真实配置请复制为 config.yaml（已被 .gitignore 忽略）
+# cp config.example.yaml config.yaml
+# 然后填入你的真实值
+
+device:
+  name: laptop            # 显示在通知标题中
+  group: local            # 分组：local / cluster / cloud
+
+backends:
+  - name: bark
+    enabled: true
+    server: "https://api.day.app"
+    key: "YOUR_BARK_KEY"  # 替换为你的 Bark 设备密钥
+    sound: "bell"
+    level_map:
+      info: active
+      warning: timeSensitive
+      error: timeSensitive
+
+enrichers: []             # Step 4 填充
+
+filters:
+  min_duration_seconds: 0 # Step 5 启用
+
+summary:
+  max_length: 200
+  truncate_suffix: "..."
