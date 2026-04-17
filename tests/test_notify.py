@@ -67,7 +67,7 @@ def test_extract_summary_malformed():
 
 
 def test_build_notification_stop():
-    """Stop event → title has ✅, body has project/session/path."""
+    """Stop event → title has ✅, body has project/session/path, default exit=end_turn."""
     payload = {
         "hook_event_name": "Stop",
         "session_id": "abcdef12345678",
@@ -78,11 +78,12 @@ def test_build_notification_stop():
     assert "✅" in title
     assert "demo-project" in body
     assert "abcdef12" in body
+    assert "退出：end_turn" in body
     assert "active" == level
 
 
 def test_build_notification_notification():
-    """Notification event → title has ⚠️, level=timeSensitive."""
+    """Notification event → title has ⚠️, level=timeSensitive, no exit line."""
     payload = {
         "hook_event_name": "Notification",
         "session_id": "xyz",
@@ -92,6 +93,54 @@ def test_build_notification_notification():
     title, body, level = build_notification(payload)
     assert "⚠️" in title
     assert "timeSensitive" == level
+    assert "退出：" not in body
+
+
+# ── stop_reason ────────────────────────────────────────────────────────────
+
+
+def test_stop_reason_error():
+    payload = {
+        "hook_event_name": "Stop", "session_id": "x", "cwd": "/tmp",
+        "transcript_path": "", "stop_reason": "error",
+    }
+    title, body, level = build_notification(payload)
+    assert "❌" in title
+    assert "出错退出" in title
+    assert "timeSensitive" == level
+    assert "退出：error" in body
+
+
+def test_stop_reason_user_interrupted():
+    payload = {
+        "hook_event_name": "Stop", "session_id": "x", "cwd": "/tmp",
+        "transcript_path": "", "stop_reason": "user_interrupted",
+    }
+    title, body, level = build_notification(payload)
+    assert "🛑" in title
+    assert "已中断" in title
+    assert "active" == level
+
+
+def test_stop_reason_max_tokens():
+    payload = {
+        "hook_event_name": "Stop", "session_id": "x", "cwd": "/tmp",
+        "transcript_path": "", "stop_reason": "max_tokens",
+    }
+    title, body, level = build_notification(payload)
+    assert "⚠️" in title
+    assert "超长截断" in title
+    assert "timeSensitive" == level
+
+
+def test_stop_reason_end_turn_default():
+    payload = {
+        "hook_event_name": "Stop", "session_id": "x", "cwd": "/tmp",
+        "transcript_path": "",
+    }
+    title, body, level = build_notification(payload)
+    assert "✅" in title
+    assert "退出：end_turn" in body
 
 
 # ── main (dry-run + duration filter) ────────────────────────────────────────

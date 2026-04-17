@@ -39,12 +39,15 @@ flowchart LR
 
 ## 事件 → emoji / level 映射
 
-| Hook Event | Emoji | Label | Bark Level |
-|------------|-------|-------|------------|
-| `Stop` | ✅ | 完成 | `active` |
-| `Notification` | ⚠️ | 需要确认 | `timeSensitive` |
-| `SubagentStop` | 🤖 | 子任务完成 | `active` |
-| 其他 | 🔔 | 事件 | `active` |
+| Hook Event | stop_reason | Emoji | Label | Bark Level |
+|------------|-------------|-------|-------|------------|
+| `Stop` | *(default / end_turn)* | ✅ | 完成 | `active` |
+| `Stop` | `error` / `api_error` | ❌ | 出错退出 | `timeSensitive` |
+| `Stop` | `user_interrupted` | 🛑 | 已中断 | `active` |
+| `Stop` | `max_tokens` | ⚠️ | 超长截断 | `timeSensitive` |
+| `Notification` | — | ⚠️ | 需要确认 | `timeSensitive` |
+| `SubagentStop` | — | 🤖 | 子任务完成 | `active` |
+| 其他 | — | 🔔 | 事件 | `active` |
 
 ---
 

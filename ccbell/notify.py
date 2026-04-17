@@ -143,14 +143,27 @@ def extract_summary(transcript_path: str | None) -> str:
     cleaned = sanitize(last)
     return truncate(cleaned, SUMMARY_MAX) if cleaned else ""
 
-# ── Event presets ────────────────────────────────────────────────────────────
+# ── Event → emoji/level resolver ─────────────────────────────────────────────
 
-EVENT_PRESETS: dict[str, dict] = {
-    "Stop":         {"emoji": "✅", "label": "完成",       "level": "active"},
-    "SubagentStop": {"emoji": "🤖", "label": "子任务完成", "level": "active"},
-    "Notification": {"emoji": "⚠️", "label": "需要确认",   "level": "timeSensitive"},
-}
-_UNKNOWN_PRESET = {"emoji": "🔔", "label": "事件", "level": "active"}
+
+def resolve_preset(payload: dict) -> dict:
+    """Determine emoji, label, and level from hook event + stop_reason."""
+    event = payload.get("hook_event_name", "")
+    stop_reason = (payload.get("stop_reason") or "").strip()
+
+    if event == "Notification":
+        return {"emoji": "⚠️", "label": "需要确认", "level": "timeSensitive"}
+    if event == "SubagentStop":
+        return {"emoji": "🤖", "label": "子任务完成", "level": "active"}
+    if event == "Stop":
+        if stop_reason in ("error", "api_error"):
+            return {"emoji": "❌", "label": "出错退出", "level": "timeSensitive"}
+        if stop_reason == "user_interrupted":
+            return {"emoji": "🛑", "label": "已中断", "level": "active"}
+        if stop_reason == "max_tokens":
+            return {"emoji": "⚠️", "label": "超长截断", "level": "timeSensitive"}
+        return {"emoji": "✅", "label": "完成", "level": "active"}
+    return {"emoji": "🔔", "label": "事件", "level": "active"}
 
 # ── Bark push ────────────────────────────────────────────────────────────────
 
@@ -189,9 +202,10 @@ def build_notification(payload: dict) -> tuple[str, str, str]:
     session_id = payload.get("session_id") or ""
     cwd = payload.get("cwd") or ""
     transcript_path = payload.get("transcript_path") or ""
+    stop_reason = (payload.get("stop_reason") or "").strip()
 
     project = Path(cwd).name if cwd else "unknown"
-    preset = EVENT_PRESETS.get(event, _UNKNOWN_PRESET)
+    preset = resolve_preset(payload)
     now = datetime.now().strftime("%H:%M:%S")
     short_sid = session_id[:8] if session_id else "--------"
 
@@ -201,6 +215,10 @@ def build_notification(payload: dict) -> tuple[str, str, str]:
         f"会话：{short_sid}  时间：{now}",
         f"路径：{sanitize(cwd)}",
     ]
+
+    # Stop events: show exit reason
+    if event == "Stop":
+        lines.append(f"退出：{stop_reason or 'end_turn'}")
 
     summary = extract_summary(transcript_path)
     if summary:
