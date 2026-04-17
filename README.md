@@ -45,7 +45,43 @@ Optionally, ccbell can enrich notifications with training experiment links, job 
 
 ## Quick start
 
-> **TODO** — Installation and first-run instructions will be added in a future release.
+> **Note:** ccbell is currently at v0.1 dev. No real push notifications are sent yet — this is a dry-run skeleton to validate the hook integration.
+
+### 1. Register hooks in Claude Code settings
+
+Add the following to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python3 /path/to/ccbell/hooks/dispatch.py"
+      }
+    ],
+    "Notification": [
+      {
+        "type": "command",
+        "command": "python3 /path/to/ccbell/hooks/dispatch.py"
+      }
+    ]
+  }
+}
+```
+
+Replace `/path/to/ccbell` with the actual path to your local ccbell repository.
+
+### 2. Dry-run test
+
+```bash
+# From the ccbell repository root
+echo '{"hook_event_name":"Stop","session_id":"abcdef1234567890","cwd":"/tmp/demo-project","transcript_path":""}' \
+  | CCBELL_DEVICE_NAME=laptop CCBELL_DEBUG=1 python3 hooks/dispatch.py
+```
+
+You should see structured output on stderr (CCBELL_TITLE, CCBELL_BODY, etc.) and the exit code should be `0`.
+Logs are also written to `~/.ccbell/ccbell.log`.
 
 ## Configuration
 

@@ -98,6 +98,13 @@ Hook 脚本通过环境变量或 stdin 接收以下信息：
 
 > 具体的 payload 格式待 Step 1 实现 hook 脚本时确认，此处为设计草案。
 
+### 4.3 Step 1 实现说明
+
+- **入口脚本**：`hooks/dispatch.py`（`python3 hooks/dispatch.py` 或 `python -m ccbell`）
+- **Python 包**：`ccbell/` 包，包含 `dispatcher.py`（核心调度）、`config.py`（环境变量配置）、`logger.py`（日志）
+- **日志文件**：`~/.ccbell/ccbell.log`
+- **本步未实现**：backends 调用、summary 解析、config.yaml、enrichers、duration 过滤
+
 ---
 
 ## 5. 配置系统
