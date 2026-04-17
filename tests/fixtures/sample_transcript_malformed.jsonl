@@ -1,0 +1,3 @@
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"first good"}]}}
+this line is not valid json at all
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"second good final"}]}}

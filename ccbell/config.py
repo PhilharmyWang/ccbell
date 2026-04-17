@@ -27,6 +27,8 @@ class RuntimeConfig:
     backends: list[str] = field(default_factory=list)
     debug: bool = False
     min_duration_seconds: int = 0
+    summary_max_length: int = 200
+    summary_truncate_suffix: str = "..."
 
 
 def load_runtime_config() -> RuntimeConfig:
@@ -36,11 +38,17 @@ def load_runtime_config() -> RuntimeConfig:
     raw_backends = os.environ.get("CCBELL_BACKENDS", "")
     backends = [b.strip() for b in raw_backends.split(",") if b.strip()]
 
+    def _safe_int(key: str, default: int) -> int:
+        try:
+            return int(os.environ.get(key, str(default)))
+        except (ValueError, TypeError):
+            return default
+
     return RuntimeConfig(
         device_name=os.environ.get("CCBELL_DEVICE_NAME") or socket.gethostname(),
         backends=backends,
         debug=debug,
-        min_duration_seconds=int(
-            os.environ.get("CCBELL_MIN_DURATION_SECONDS", "0")
-        ),
+        min_duration_seconds=_safe_int("CCBELL_MIN_DURATION_SECONDS", 0),
+        summary_max_length=_safe_int("CCBELL_SUMMARY_MAX_LENGTH", 200),
+        summary_truncate_suffix=os.environ.get("CCBELL_SUMMARY_TRUNCATE_SUFFIX", "..."),
     )

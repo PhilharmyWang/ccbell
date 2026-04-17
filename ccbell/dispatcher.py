@@ -22,6 +22,7 @@ from pathlib import Path
 
 from ccbell.config import load_runtime_config
 from ccbell.logger import get_logger
+from ccbell.summary import build_summary
 
 log = get_logger("ccbell.dispatcher")
 
@@ -44,8 +45,7 @@ def run(payload: dict) -> int:
     event = payload.get("hook_event_name") or "Unknown"
     session_id = payload.get("session_id") or ""
     cwd = payload.get("cwd") or ""
-    # transcript_path unused in Step 1 (reserved for Step 2)
-    # transcript_path = payload.get("transcript_path") or ""
+    transcript_path = payload.get("transcript_path") or ""
 
     project_name = Path(cwd).name if cwd else "unknown"
     short_sid = session_id[:8] if session_id else "--------"
@@ -60,16 +60,34 @@ def run(payload: dict) -> int:
     group = f"ccbell-{cfg.device_name}"
     level = "warning" if event == "Notification" else "info"
 
+    # --- summary (Step 2) ---
+    summary = None
+    try:
+        summary = build_summary(
+            transcript_path or None,
+            max_len=cfg.summary_max_length,
+            suffix=cfg.summary_truncate_suffix,
+        )
+    except Exception as exc:
+        log.warning("summary extraction failed: %s", exc)
+
+    if summary:
+        body += "\n—— 摘要 ——\n" + summary
+
     # --- output to stderr ---
     print(f"CCBELL_TITLE={title}", file=sys.stderr)
     print(f"CCBELL_BODY={body}", file=sys.stderr)
     print(f"CCBELL_GROUP={group}", file=sys.stderr)
     print(f"CCBELL_LEVEL={level}", file=sys.stderr)
+    if summary:
+        print(f"summary: {summary}", file=sys.stderr)
+    else:
+        print("summary: (none)", file=sys.stderr)
     print("backends: (dry-run, none invoked)", file=sys.stderr)
 
     # --- output to log file ---
     log.info("event=%s session=%s project=%s", event, short_sid, project_name)
-    log.debug("title=%s body=%s group=%s level=%s", title, body, group, level)
+    log.debug("title=%s body=%s group=%s level=%s summary=%s", title, body, group, level, summary)
 
     return 0
 

@@ -1,0 +1,4 @@
+{"type":"user","message":{"role":"user","content":[{"type":"text","text":"hi"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"hello, I will help."}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"text","text":"thanks"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Done. Next: /home/alice/project and C:\\Users\\bob\\work finished."}]}}

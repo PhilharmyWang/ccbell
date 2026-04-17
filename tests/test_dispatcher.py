@@ -39,6 +39,34 @@ def test_main_with_invalid_json(monkeypatch):
     assert rc == 0
 
 
+def test_run_with_transcript(capsys):
+    """run() with a valid transcript should include summary in body."""
+    payload = {
+        "hook_event_name": "Stop",
+        "session_id": "abcdef1234567890",
+        "cwd": "/tmp/demo-project",
+        "transcript_path": str(FIXTURES / "sample_transcript_basic.jsonl"),
+    }
+    rc = run(payload)
+    assert rc == 0
+    captured = capsys.readouterr()
+    assert "—— 摘要 ——" in captured.err
+
+
+def test_run_without_transcript(capsys):
+    """run() with a missing transcript should show summary: (none)."""
+    payload = {
+        "hook_event_name": "Stop",
+        "session_id": "abcdef1234567890",
+        "cwd": "/tmp/demo-project",
+        "transcript_path": "/tmp/__ccbell_no_such_file__.jsonl",
+    }
+    rc = run(payload)
+    assert rc == 0
+    captured = capsys.readouterr()
+    assert "summary: (none)" in captured.err
+
+
 class _FakeStdin:
     """Minimal stdin stub for monkeypatching."""
 
