@@ -17,13 +17,12 @@ Created: 2026-04-17
 
 from __future__ import annotations
 
-import json
 import sys
 import urllib.parse
 import urllib.request
 from urllib.error import URLError
 
-from ccbell.backends.base import die, read_invocation_env
+from ccbell.backends.base import read_invocation_env
 
 
 def _url_encode(text: str) -> str:
@@ -51,10 +50,9 @@ def main() -> int:
     # build URL
     encoded_title = _url_encode(env["title"])
     encoded_body = _url_encode(env["body"])
-    encoded_group = _url_encode(env["group"])
 
     url = f"{server}/{key}/{encoded_title}/{encoded_body}"
-    params = {"group": encoded_group, "level": mapped_level}
+    params = {"group": env["group"], "level": mapped_level}
     if sound:
         params["sound"] = sound
     url += "?" + urllib.parse.urlencode(params)
