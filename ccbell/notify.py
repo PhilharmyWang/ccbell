@@ -47,7 +47,7 @@ def _safe_int(key: str, default: int) -> int:
 
 
 MIN_DURATION: int = _safe_int("CCBELL_MIN_DURATION_SECONDS", 0)
-SUMMARY_MAX: int = _safe_int("CCBELL_SUMMARY_MAX_LENGTH", 200)
+SUMMARY_MAX: int = _safe_int("CCBELL_SUMMARY_MAX_LENGTH", 300)
 
 # ── Logging (minimal, ~10 lines) ────────────────────────────────────────────
 

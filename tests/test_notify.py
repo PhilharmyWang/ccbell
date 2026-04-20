@@ -148,8 +148,8 @@ def test_stop_reason_end_turn_default():
 
 def test_main_dry_run(monkeypatch):
     """CCBELL_DRY_RUN=1 → no urlopen call, exit 0."""
-    monkeypatch.setenv("CCBELL_DRY_RUN", "1")
-    monkeypatch.setenv("BARK_KEY", "testkey")
+    monkeypatch.setattr("ccbell.notify.DRY_RUN", True)
+    monkeypatch.setattr("ccbell.notify.BARK_KEY", "testkey")
     monkeypatch.setattr("sys.stdin", _FakeStdin(
         json.dumps({"hook_event_name": "Stop", "session_id": "abc", "cwd": "/tmp", "transcript_path": ""})
     ))
@@ -161,8 +161,8 @@ def test_main_dry_run(monkeypatch):
 
 def test_main_below_min_duration(monkeypatch):
     """MIN_DURATION=60, payload duration=10 → skip push, exit 0."""
-    monkeypatch.setenv("CCBELL_MIN_DURATION_SECONDS", "60")
-    monkeypatch.setenv("BARK_KEY", "testkey")
+    monkeypatch.setattr("ccbell.notify.MIN_DURATION", 60)
+    monkeypatch.setattr("ccbell.notify.BARK_KEY", "testkey")
     monkeypatch.setattr("sys.stdin", _FakeStdin(
         json.dumps({"hook_event_name": "Stop", "session_id": "abc", "cwd": "/tmp",
                      "transcript_path": "", "duration_seconds": 10})

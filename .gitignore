@@ -35,3 +35,9 @@ Thumbs.db
 # local user config (never commit)
 config.yaml
 config.local.yaml
+
+# settings.json backups
+settings.json.bak-*
+
+# Claude Code
+.claude/
