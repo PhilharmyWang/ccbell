@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.2 (2026-04-20)
+
+- README 全中文化
+- 项目结构精简，删除未接入的 enrich 模块和冗余文档
+- 清理仓库元数据
+
 ## v0.2.1 (2026-04-20)
 
 - **Install scripts**: one-shot `install.ps1` (Windows) and `install.sh` (Linux/macOS) with Bark key / device name / emoji params

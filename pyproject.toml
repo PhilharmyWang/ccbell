@@ -1,18 +1,20 @@
 [project]
 name = "ccbell"
-version = "0.2.1"
-description = "Minimal Claude Code → iPhone notifier (Bark)"
+version = "0.2.2"
+description = "跨设备 Claude Code → iPhone 桌面推送工具"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "ccbell contributors" },
+    { name = "PhilharmyWang" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
+    "License :: OSI Approved :: MIT License",
 ]
 dependencies = []
+keywords = ["claude-code", "bark", "notification", "ios", "hooks"]
 
 [project.scripts]
 ccbell = "ccbell.notify:main"

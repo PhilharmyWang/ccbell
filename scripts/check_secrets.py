@@ -30,6 +30,10 @@ PATTERNS: list[tuple[str, re.Pattern]] = [
          r"|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}"
          r")"
      )),
+    ("Co-Authored-By Claude",
+     re.compile(r"Co-Authored-By:\s*Claude", re.IGNORECASE)),
+    ("anthropic.com URL",
+     re.compile(r"https?://[^\s]*anthropic\.com")),
 ]
 
 # Directories to skip
@@ -45,6 +49,8 @@ WHITELIST_FILES: set[str] = {
     "tests/test_notify.py",      # intentional test IPs / paths
     "config.yaml",               # .gitignored, user-specific
     "config.local.yaml",         # .gitignored, user-specific
+    "CLAUDE.md",                 # rule description mentions Co-Authored-By
+    "scripts/rewrite_history.py", # utility that strips Co-Authored-By
 }
 
 # Line content that is always safe
