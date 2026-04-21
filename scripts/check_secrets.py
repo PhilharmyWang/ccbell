@@ -51,6 +51,7 @@ WHITELIST_FILES: set[str] = {
     "config.local.yaml",         # .gitignored, user-specific
     "CLAUDE.md",                 # rule description mentions Co-Authored-By
     "scripts/rewrite_history.py", # utility that strips Co-Authored-By
+    "scripts/commit_via_dulwich.py", # git author info, not a secret
 }
 
 # Line content that is always safe
